@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./public/lume-icon.png" alt="Lume icon" width="110" />
+</p>
+
 # Lume
 
 Read the web, not the noise. 🔊

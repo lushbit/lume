@@ -74,6 +74,11 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Lume - Main",
   description: "An ad-free article reader built for focused reading.",
+  icons: {
+    icon: "/lume-icon.png",
+    shortcut: "/lume-icon.png",
+    apple: "/lume-icon.png",
+  },
 };
 
 export default function RootLayout({
