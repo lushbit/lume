@@ -78,7 +78,7 @@ export function applyZenImages(html: string) {
   const doc = parser.parseFromString(html, "text/html");
   const images = Array.from(doc.querySelectorAll("img"));
   const seenSources = new Set<string>();
-  for (const image of images) {
+  for (const [index, image] of images.entries()) {
     if (image.closest("[data-lume-zen='true']")) {
       continue;
     }
@@ -110,13 +110,24 @@ export function applyZenImages(html: string) {
       seenSources.add(sourceKey);
     }
 
+    const mediaElement = image.parentElement?.tagName === "PICTURE" ? image.parentElement : image;
+    const anchorParent = mediaElement.parentElement?.tagName === "A" ? mediaElement.parentElement : null;
+    const imageSourceUrl = (anchorParent?.getAttribute("href") ?? resolvedSrc).trim();
+
+    const block = doc.createElement("figure");
+    block.className = "lume-zen-block";
+
+    const imageKey = `lume-image-${index}`;
+
     const wrapper = doc.createElement("div");
     wrapper.className = "lume-zen-image group relative overflow-hidden rounded-2xl border border-current/15";
     wrapper.setAttribute("data-lume-zen", "true");
-    wrapper.setAttribute("data-lume-zen-key", sourceKey);
+    wrapper.setAttribute("data-lume-zen-key", imageKey);
+    wrapper.setAttribute("data-revealed", "false");
 
     image.classList.add("lume-zen-target", "w-full", "h-auto", "transition-all", "duration-700", "ease-out");
     image.setAttribute("loading", "lazy");
+    image.setAttribute("draggable", "false");
 
     const overlay = doc.createElement("div");
     overlay.className =
@@ -129,12 +140,30 @@ export function applyZenImages(html: string) {
       "pointer-events-none text-xs uppercase tracking-[0.22em] text-white";
     label.textContent = "Reveal Visual";
 
-    const mediaElement = image.parentElement?.tagName === "PICTURE" ? image.parentElement : image;
-
     overlay.appendChild(label);
-    mediaElement.replaceWith(wrapper);
+    if (anchorParent) {
+      anchorParent.replaceWith(block);
+    } else {
+      mediaElement.replaceWith(block);
+    }
+    block.appendChild(wrapper);
     wrapper.appendChild(mediaElement);
     wrapper.appendChild(overlay);
+
+    if (imageSourceUrl) {
+      const caption = doc.createElement("figcaption");
+      caption.className = "lume-zen-caption";
+
+      const sourceLink = doc.createElement("a");
+      sourceLink.className = "lume-zen-source";
+      sourceLink.textContent = "Open original image";
+      sourceLink.setAttribute("href", imageSourceUrl);
+      sourceLink.setAttribute("target", "_blank");
+      sourceLink.setAttribute("rel", "noopener noreferrer");
+
+      caption.appendChild(sourceLink);
+      block.appendChild(caption);
+    }
   }
 
   return doc.body.innerHTML;

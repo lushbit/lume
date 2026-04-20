@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, BookmarkPlus, Copy, Crosshair, LoaderCircle, Palette, Type, Zap } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLibrary } from "@/hooks/use-library";
 import { processReaderHtml } from "@/lib/content-utils";
 import { THEME_ORDER, type ThemeName, themeConfig } from "@/lib/vibe";
@@ -97,7 +97,7 @@ export default function ReaderPage() {
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = articleContainerRef.current;
     if (!root) {
       return;
@@ -182,6 +182,7 @@ export default function ReaderPage() {
 
           if (response.ok) {
             if (payload.title && payload.content && payload.text && payload.sourceUrl) {
+              setRevealedImageKeys([]);
               setArticle(payload as ExtractResponse);
               return;
             }
@@ -452,6 +453,12 @@ export default function ReaderPage() {
         onClick={(event) => {
           revealFromTarget(event.target);
         }}
+        onDragStart={(event) => {
+          const target = event.target as HTMLElement;
+          if (target.closest(".lume-zen-target")) {
+            event.preventDefault();
+          }
+        }}
         className={`mx-auto w-full max-w-2xl px-6 pt-20 transition-[opacity,filter] duration-[520ms] ease-out sm:px-10 sm:pt-24 ${fontMorphing ? "opacity-90 blur-[0.5px]" : "opacity-100 blur-0"}`}
       >
         <header className="mb-12 space-y-3">
@@ -476,7 +483,7 @@ export default function ReaderPage() {
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.65, ease: "easeOut" }}
               dangerouslySetInnerHTML={{ __html: block }}
-              className="selection:bg-current/20 [&_a]:underline [&_blockquote]:border-l-2 [&_blockquote]:border-current/35 [&_blockquote]:pl-4 [&_h2]:mt-8 [&_h2]:text-3xl [&_h2]:font-semibold [&_h3]:mt-8 [&_h3]:text-2xl [&_h3]:font-semibold [&_h4]:mt-7 [&_h4]:text-xl [&_h4]:font-semibold [&_h5]:mt-6 [&_h5]:text-lg [&_h5]:font-semibold [&_h6]:mt-6 [&_h6]:text-base [&_h6]:font-semibold [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:opacity-95 [&_p>strong:first-child]:mt-7 [&_p>strong:first-child]:mb-2 [&_p>strong:first-child]:block [&_p>strong:first-child]:text-[1.15em] [&_p>strong:first-child]:font-semibold [&_pre]:overflow-x-auto [&_pre]:rounded-2xl [&_pre]:border [&_pre]:border-current/20 [&_pre]:p-4 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6"
+              className="selection:bg-current/20 [&_a]:underline [&_blockquote]:border-l-2 [&_blockquote]:border-current/35 [&_blockquote]:pl-4 [&_figcaption]:mt-2 [&_figcaption]:text-[0.72em] [&_figcaption]:leading-relaxed [&_figcaption]:opacity-75 [&_h2]:mt-8 [&_h2]:text-3xl [&_h2]:font-semibold [&_h3]:mt-8 [&_h3]:text-2xl [&_h3]:font-semibold [&_h4]:mt-7 [&_h4]:text-xl [&_h4]:font-semibold [&_h5]:mt-6 [&_h5]:text-lg [&_h5]:font-semibold [&_h6]:mt-6 [&_h6]:text-base [&_h6]:font-semibold [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:opacity-95 [&_p>strong:first-child]:mt-7 [&_p>strong:first-child]:mb-2 [&_p>strong:first-child]:block [&_p>strong:first-child]:text-[1.15em] [&_p>strong:first-child]:font-semibold [&_pre]:overflow-x-auto [&_pre]:rounded-2xl [&_pre]:border [&_pre]:border-current/20 [&_pre]:p-4 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-6"
             />
           ))}
         </div>

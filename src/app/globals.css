@@ -45,6 +45,8 @@ body::before {
 .lume-zen-image .lume-zen-target {
   filter: blur(12px);
   transform: scale(1.02);
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 .lume-zen-image[data-revealed="true"] .lume-zen-target {
@@ -56,6 +58,30 @@ body::before {
   opacity: 0;
   pointer-events: none;
   backdrop-filter: blur(0);
+}
+
+.lume-zen-block {
+  margin: 0;
+}
+
+.lume-zen-caption {
+  margin-top: 0.35rem;
+  line-height: 1;
+}
+
+.lume-zen-source {
+  display: inline-block;
+  font-size: 0.67rem;
+  line-height: 1.2;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  opacity: 0.66;
+  color: currentcolor;
+  letter-spacing: 0.01em;
+}
+
+.lume-zen-source:hover {
+  opacity: 0.96;
 }
 
 .noise-mark {
