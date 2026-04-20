@@ -1,9 +1,9 @@
 import dns from "node:dns/promises";
 import net from "node:net";
 import { Readability } from "@mozilla/readability";
-import DOMPurify from "isomorphic-dompurify";
 import { JSDOM } from "jsdom";
 import { NextResponse } from "next/server";
+import sanitizeHtml from "sanitize-html";
 
 type ExtractRequest = {
   url?: string;
@@ -490,8 +490,8 @@ async function validateHost(url: URL): Promise<GuardResult> {
 }
 
 function sanitizeArticleHtml(input: string) {
-  return DOMPurify.sanitize(input, {
-    ALLOWED_TAGS: [
+  return sanitizeHtml(input, {
+    allowedTags: [
       "p",
       "h1",
       "h2",
@@ -515,9 +515,13 @@ function sanitizeArticleHtml(input: string) {
       "figure",
       "figcaption",
     ],
-    ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "title", "width", "height", "loading"],
-    FORBID_TAGS: ["script", "iframe", "object"],
-    ALLOW_UNKNOWN_PROTOCOLS: false,
+    allowedAttributes: {
+      a: ["href", "target", "rel"],
+      img: ["src", "alt", "title", "width", "height", "loading"],
+      "*": [],
+    },
+    allowedSchemes: ["http", "https", "mailto"],
+    disallowedTagsMode: "discard",
   });
 }
 
