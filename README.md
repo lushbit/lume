@@ -27,7 +27,15 @@ With Lume, you get:
 
 If you don’t want to self-host, use the public instance:
 
-- **Lume Public URL:** _Add your deployed URL here_
+- **Lume Public URL:** [https://lume-reader.vercel.app/](https://lume-reader.vercel.app/)
+
+## Browser Extension
+
+Lume also has a browser extension that can detect supported pages and suggest opening them in Lume.
+
+- **Extension GitHub:** [https://github.com/lushbit/lume-extension](https://github.com/lushbit/lume-extension)
+- **Firefox download:** [https://addons.mozilla.org/en-US/firefox/addon/lume/](https://addons.mozilla.org/en-US/firefox/addon/lume/)
+- **Chrome:** Available via advanced installation (see setup details in the extension GitHub repo)
 
 ## For Developers & Hosters
 
@@ -37,7 +45,7 @@ If you don’t want to self-host, use the public instance:
 - React + TypeScript
 - Tailwind CSS
 - Mozilla Readability + JSDOM
-- DOMPurify sanitization
+- sanitize-html sanitization
 
 ### Local setup
 
