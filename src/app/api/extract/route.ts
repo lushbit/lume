@@ -541,7 +541,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as ExtractRequest;
+    let body: ExtractRequest;
+    try {
+      body = (await request.json()) as ExtractRequest;
+    } catch {
+      return NextResponse.json(
+        { error: "invalid_request_body", message: "Request body must be valid JSON." },
+        { status: 400 },
+      );
+    }
     if (!body.url) {
       return NextResponse.json({ error: "URL is required." }, { status: 400 });
     }
@@ -811,9 +819,14 @@ export async function POST(request: Request) {
       text: article.textContent,
       sourceUrl: currentUrl.toString(),
     });
-  } catch {
+  } catch (error) {
     const clientKey = getClientKey(request);
     recordSecurityEvent(clientKey, "failed", "processing_failed_uncaught");
+    console.error("[lume-extract-uncaught]", {
+      clientKey,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
       { error: "processing_failed", message: "We could not process this link right now. Please try another article URL." },
       { status: 500 },

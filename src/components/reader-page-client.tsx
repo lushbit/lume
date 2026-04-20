@@ -19,6 +19,11 @@ type ExtractResponse = {
   message?: string;
 };
 
+type ExtractPayload = Partial<ExtractResponse> & {
+  error?: string;
+  message?: string;
+};
+
 const LUSHBIT = "#1a5d3b";
 
 function splitContentBlocks(content: string) {
@@ -165,17 +170,32 @@ export default function ReaderPage() {
             continue;
           }
 
-          const payload = (await response.json()) as ExtractResponse;
+          const responseBody = await response.text();
+          let payload: ExtractPayload = {};
+          if (responseBody) {
+            try {
+              payload = JSON.parse(responseBody) as ExtractPayload;
+            } catch {
+              payload = {};
+            }
+          }
+
           if (response.ok) {
-            setArticle(payload);
-            return;
+            if (payload.title && payload.content && payload.text && payload.sourceUrl) {
+              setArticle(payload as ExtractResponse);
+              return;
+            }
+            throw new Error("This website returned an unexpected response format.");
           }
 
           const terminalError =
             payload.message ??
             (payload.error === "low_content_density"
               ? "This page does not have enough readable article content."
-              : payload.error ?? "We could not parse this link.");
+              : payload.error ??
+                (responseBody
+                  ? `Extraction failed with HTTP ${response.status}.`
+                  : "We could not parse this link."));
           const isTerminal = response.status === 400 || response.status === 422;
 
           if (isTerminal || attempt >= MAX_ATTEMPTS) {
